@@ -16,6 +16,10 @@
 		<!-- FB Auth needs to be loaded with priority -->
 		<script src="//connect.facebook.net/en_US/all.js"></script>
 	</head>
+	<body>
+		<div id="fb-root"></div>
+		<div>Hello world!</div>
+		<div> user: 
 <?php 
 require './facebook/src/facebook.php';
 /*FB APP Details*/
@@ -46,6 +50,8 @@ session_start();
 			// Proceed knowing you have a logged in user who's authenticated.
 			$user_profile = $facebook->api('/me');
 			$user_id = $user_profile["id"];
+			
+			echo $user_id;
 			//id
 			//first_name
 			//gender => male
@@ -57,17 +63,14 @@ session_start();
 			//updated_time
 			//verified
 			
-			if (checkAuth() == null){
-				//save the user id as validation of log in
-				setAuth($user_id, $prod_request);
-			}
-		
 		} catch (FacebookApiException $e) {
 			if (!$prod_request){
 				echo "Exception occurred, code: " . $e->getCode();
 				echo " with message: " . $e->getMessage();
 			}
 		}	
+	} else {
+		echo "no user";
 	}
 
 	// Login or logout url will be needed depending on current user state.
@@ -77,16 +80,6 @@ session_start();
 	  $loginUrl = $facebook->getLoginUrl();
 	}
 	
-?>
-
-	<body>
-		<div id="fb-root"></div>
-		<div>Hello world!</div>
-		<div> user: 
-<?php
-	$user_id = checkAuth();
-	echo $user_id;
-
 ?>
 		</div>
 	</body>
