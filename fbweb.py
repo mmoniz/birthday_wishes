@@ -34,8 +34,8 @@ def findUrl(driver):
 
 #user_email = raw_input("enter users email address ")
 #user_pass = raw_input("enter users password ")
-user_email = 'flora_ripudaman@hotmail.com'
-user_pass = 'Pavi1517'
+user_email = '****'
+user_pass = '****''
 #browser= Browser('firefox')
 
 driver = webdriver.Firefox()
