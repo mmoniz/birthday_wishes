@@ -58,7 +58,7 @@ class BirthdayWish(BasePage):
 		for el in statuselement:
 			if 'textarea' in el.tag_name:
 				el.send_keys(message)
-				#el.submit()
+				el.submit()
 
 
 #Navigating to the url
