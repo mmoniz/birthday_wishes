@@ -1,63 +1,85 @@
-import webbrowser
-import requests, bs4
-import urllib3 
 from selenium import webdriver
-import re,sys
+import time,random
 from selenium.webdriver.common.keys import Keys
-import time
-
-#url = 'http://www.facebook.com'
-
-# Open URL in new browser window
-#webbrowser.open_new(url) # opens in default browser
+from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 
-from splinter import Browser
+driver = webdriver.Chrome()
+url = "https://www.facebook.com/events/birthdays"
+user_email = 'your email'
+user_pass = 'your pasword'
+msgL = ['Happy Birthday :)','Many happy returns of the day :)','HBD :)']
 
-def happy (driver, url):
-	print url
-	driver.get(url)
 
-	elem = driver.find_element_by_class_name('_3br6')
-	elem.click()
+class BasePage:
 
-	elem.send_keys("Happy birthday")
+	def __init__(self, driver):
+		self.driver = driver
 
-	elem.send_keys(Keys.RETURN)
+	def navigate(self,url):
+		self.driver.get(url)
 
-def findUrl(driver):
-	brow = driver.find_element_by_class_name('_cwn')
-	obj = re.findall(r"href=\"https://www.facebook.com/[\w*.]+",brow.get_attribute("outerHTML"))
-	#print obj
-	return obj
+	def browserClose(self,driver):
+		self.driver.close()
 
-#user_email = raw_input("enter users email address ")
-#user_pass = raw_input("enter users password ")
-user_email = 'flora_ripudaman@hotmail.com'
-user_pass = 'Pavi1517'
-#browser= Browser('firefox')
 
-driver = webdriver.Firefox()
+class FacebookLogin(BasePage):
 
-driver.get('https://www.facebook.com/events/birthdays')
+	def login(self,email,password,driver):
+		try:
+			self.driver = driver
+			self.email = email
+			self.password = password
+			emailelement = self.driver.find_element_by_name('email')
+			passwordelement = self.driver.find_element_by_name('pass')
+			emailelement.send_keys(self.email)
+			passwordelement.send_keys(self.password)
 
-#browser.fill('email', user_email)
-elem = driver.find_element_by_name('email')
-elem.send_keys(user_email)
+			#logging in to the facebook using Selenium
+			emailelement.send_keys(Keys.RETURN)
 
-elem = driver.find_element_by_name('pass')
-elem.send_keys(user_pass)
+		except Exception as inst:
+			print type(inst)     # the exception instance
+			print inst.args      # arguments stored in .args
+			print inst
+			print "Please check your credential again."
 
-elem.send_keys(Keys.RETURN)
 
+
+class BirthdayWish(BasePage):
+
+	def wishPeopleHappyBirthday(self,driver,message):
+		statuselement = self.driver.find_elements_by_xpath("//*[@id=\"events_birthday_view\"]/div[1]/div[2]//*")
+		#posting to the facebook
+		for el in statuselement:
+			if 'textarea' in el.tag_name:
+				el.send_keys(message)
+				#el.submit()
+
+
+#Navigating to the url
+basePage = BasePage(driver)
+basePage.navigate(url)
 time.sleep(3)
 
+# Logging in facebook by using email and password
+facebookLogin = FacebookLogin(driver)
+facebookLogin.login(user_email,user_pass,driver)
+time.sleep(3)
 
-happy(driver, "https://www.facebook.com/melissa.athena")
+#Randomly picks up one of the message from msgL
+randomMsg = (random.choice(msgL))
 
-#obj = findUrl(driver)
+# Wishing Birthday
+birthdayWish = BirthdayWish(driver)
+birthdayWish.wishPeopleHappyBirthday(driver,randomMsg)
+time.sleep(3)
 
-#for names in obj:
-#	happy(names.split("href=\"")[1])
+# Closing the current Browser
+basePage.browserClose(driver)
+
 
