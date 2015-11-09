@@ -1,0 +1,18 @@
+#To run the job daily or at certain time during the day, we used cron job
+
+First you will need to execute in the unix system:
+crontab -e
+
+An editor will open where you can enter the following:
+
+MAILTO=flora_ripudaman@hotmail.com
+*/57 18 * * * python <path to your python script>
+
+where 57 is a minute, and 18 is an hour
+
+MAILTO option is optional
+
+If you want to pipe the output to the file, you can do that via the following:
+*/57 18 * * * python <path to your python script> >> /tmp/blah.txt
+
+where /tmp/blah.txt could be any directory where you would like to store the log.
