@@ -7,8 +7,12 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 
 
+#Open up the browser
+#driver = webdriver.Chrome()
 
-driver = webdriver.Chrome()
+#The easiest way to hide the browser is to install PhantomJS.
+driver = webdriver.PhantomJS()
+
 url = "https://www.facebook.com/events/birthdays"
 user_email = 'your email'
 user_pass = 'your pasword'
