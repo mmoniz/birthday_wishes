@@ -1,10 +1,11 @@
 from selenium import webdriver
-import time,random
+import random
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 #Open up the browser
@@ -17,27 +18,23 @@ url = "https://www.facebook.com/events/birthdays"
 user_email = 'your email'
 user_pass = 'your pasword'
 msgL = ['Happy Birthday :)','Many happy returns of the day :)','HBD :)']
+waitTime = 10
 
 
-class BasePage:
+class FacebookBirthdayWishes:
 
-	def __init__(self, driver):
+	def __init__(self, driver,url,email,password,msg):
 		self.driver = driver
+		self.url = url
+		self.email = email
+		self.password = password
+		self.msg = msg
 
 	def navigate(self,url):
 		self.driver.get(url)
 
-	def browserClose(self,driver):
-		self.driver.close()
-
-
-class FacebookLogin(BasePage):
-
 	def login(self,email,password,driver):
 		try:
-			self.driver = driver
-			self.email = email
-			self.password = password
 			emailelement = self.driver.find_element_by_name('email')
 			passwordelement = self.driver.find_element_by_name('pass')
 			emailelement.send_keys(self.email)
@@ -49,41 +46,41 @@ class FacebookLogin(BasePage):
 		except Exception as inst:
 			print type(inst)     # the exception instance
 			print inst.args      # arguments stored in .args
-			print inst
+			print inst 
 			print "Please check your credential again."
 
-
-
-class BirthdayWish(BasePage):
-
-	def wishPeopleHappyBirthday(self,driver,message):
+	def wishPeopleHappyBirthday(self,driver,msg):
 		statuselement = self.driver.find_elements_by_xpath("//*[@id=\"events_birthday_view\"]/div[1]/div[2]//*")
+	
 		#posting to the facebook
 		for el in statuselement:
 			if 'textarea' in el.tag_name:
-				el.send_keys(message)
+				#Randomly picks up one of the message from msg
+				randomMsg = (random.choice(self.msg))
+				el.send_keys(randomMsg)
 				el.submit()
+
+	def browserClose(self,driver):
+		self.driver.close()
+
+	def browserWaitUntilForConditon(self,driver,time):
+		try:
+			element = WebDriverWait(self.driver, time).until(EC.presence_of_element_located((By.ID, "events_birthday_view")))
+		except:
+			print "Couldn't find birthday page, Please check the url"
+			driver.quit()
 
 
 #Navigating to the url
-basePage = BasePage(driver)
-basePage.navigate(url)
-time.sleep(3)
+facebookBirthdayWishes = FacebookBirthdayWishes(driver,url,user_email,user_pass,msgL)
+facebookBirthdayWishes.navigate(url)
 
 # Logging in facebook by using email and password
-facebookLogin = FacebookLogin(driver)
-facebookLogin.login(user_email,user_pass,driver)
-time.sleep(3)
-
-#Randomly picks up one of the message from msgL
-randomMsg = (random.choice(msgL))
+facebookBirthdayWishes.login(user_email,user_pass,driver)
+facebookBirthdayWishes.browserWaitUntilForConditon(driver,waitTime)
 
 # Wishing Birthday
-birthdayWish = BirthdayWish(driver)
-birthdayWish.wishPeopleHappyBirthday(driver,randomMsg)
-time.sleep(3)
+facebookBirthdayWishes.wishPeopleHappyBirthday(driver,msgL)
 
 # Closing the current Browser
-basePage.browserClose(driver)
-
-
+facebookBirthdayWishes.browserClose(driver)
